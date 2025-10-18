@@ -1,0 +1,81 @@
+services:
+  ctfd:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - UPLOAD_FOLDER=/var/uploads
+      - DATABASE_URL=postgresql+psycopg2://ctfd:ctfd@db/ctfd
+      - REDIS_URL=redis://cache:6379
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
+      - KEYCLOAK_CLIENT_ID=vctf
+      - KEYCLOAK_METADATA_URL=http://sso:8080/realms/vctf/.well-known/openid-configuration
+    env_file:
+      - .env
+    volumes:
+      - .data/CTFd/logs:/var/log/CTFd
+      - .data/CTFd/uploads:/var/uploads
+    depends_on:
+      - db
+    networks:
+        default:
+        internal:
+
+  nginx:
+    image: nginx:stable
+    restart: always
+    volumes:
+      - ./http.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    depends_on:
+      - ctfd
+
+  db:
+    image: postgres:17.5
+    restart: always
+    environment:
+      - POSTGRES_USER=ctfd
+      - POSTGRES_PASSWORD=ctfd
+      - POSTGRES_DB=ctfd
+    volumes:
+      - .data/postgres:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+    networks:
+        default:
+        internal:
+
+  cache:
+    image: redis:4
+    restart: always
+    volumes:
+    - .data/redis:/data
+    networks:
+        internal:
+
+  sso:
+    image: quay.io/keycloak/keycloak:26.2.5
+    restart: always
+    environment:
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=sso
+    volumes:
+      - .data/keycloak:/opt/keycloak/data/
+    ports:
+      - "8080:8080"
+    networks:
+        default:
+        internal:
+    command: [start-dev]
+
+networks:
+    default:
+    internal:
+        internal: true
