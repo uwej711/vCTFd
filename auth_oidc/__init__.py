@@ -1,11 +1,9 @@
 import os
-
-from flask import session, redirect, url_for
-from authlib.integrations.flask_client import OAuth
-
 from CTFd.models import db, Users
-from CTFd.utils import get_config, set_config
+from CTFd.utils import get_config, set_config, get_app_config
 from CTFd.utils.security.auth import login_user
+from authlib.integrations.flask_client import OAuth
+from flask import session, redirect, url_for
 
 
 def load(app):
@@ -29,9 +27,9 @@ def load(app):
     oauth = OAuth(app)
     oauth.register(
         "keycloak",
-        client_id=os.getenv("KEYCLOAK_CLIENT_ID"),
-        client_secret=os.getenv("KEYCLOAK_CLIENT_SECRET"),
-        server_metadata_url=os.getenv("KEYCLOAK_METADATA_URL"),
+        client_id=get_app_config("KEYCLOAK_CLIENT_ID"),
+        client_secret=get_app_config("KEYCLOAK_CLIENT_SECRET"),
+        server_metadata_url=get_app_config("KEYCLOAK_METADATA_URL"),
         client_kwargs={
             "scope": "openid profile email",
             'code_challenge_method': 'S256'  # enable PKCE

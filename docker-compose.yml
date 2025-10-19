@@ -13,8 +13,9 @@ services:
       - ACCESS_LOG=-
       - ERROR_LOG=-
       - REVERSE_PROXY=true
-      - KEYCLOAK_CLIENT_ID=vctf
+      - KEYCLOAK_CLIENT_ID=vctfd
       - KEYCLOAK_METADATA_URL=http://sso:8080/realms/vctf/.well-known/openid-configuration
+      - UPLOAD_PROVIDER=bws
     env_file:
       - .env
     volumes:

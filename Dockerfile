@@ -2,8 +2,10 @@ FROM docker.io/ctfd/ctfd:3.8.0
 
 USER root
 
-COPY ./auth-oidc /opt/CTFd/CTFd/plugins/auth_oidc
+COPY ./auth_oidc /opt/CTFd/CTFd/plugins/auth_oidc
+COPY ./bws_s3 /opt/CTFd/CTFd/plugins/bws_s3
 COPY ./requirements.txt /opt/CTFd
+COPY ./config.ini /opt/CTFd/CTFd
 
 USER ctfd
 
