@@ -1,7 +1,7 @@
 import os
 from CTFd.models import db, Users
-from CTFd.utils import get_config, set_config, get_app_config
-from CTFd.utils.security.auth import login_user
+from CTFd.utils import get_config, set_config, get_app_config, user as current_user
+from CTFd.utils.security.auth import login_user, logout_user
 from authlib.integrations.flask_client import OAuth
 from flask import session, redirect, url_for
 
@@ -44,16 +44,35 @@ def load(app):
         if userinfo:
             user = get_or_create_user(
                 email=userinfo["email"],
-                name=userinfo["name"])
+                name=userinfo["name"]
+            )
 
             session.regenerate()
             login_user(user)
+            session.permanent = False
+            session["id_token"] = token["id_token"]
+
             db.session.close()
 
-        return redirect('/')
+        return redirect(url_for("challenges.listing"))
+
+    @app.route('/post-logout')
+    def logout():
+        logout_user()
+        return redirect(url_for("views.static_html"))
+
+
+    def sso_logout():
+        if current_user.authed():
+            metadata = oauth.keycloak.load_server_metadata()
+            return redirect(metadata["end_session_endpoint"] + "?id_token_hint=" + session["id_token"] + "&post_logout_redirect_uri=" + url_for("logout", _external=True))
+
+        return redirect(url_for("views.static_html"))
+
 
     set_config('registration_visibility', False)
     app.view_functions['auth.login'] = lambda: oauth.keycloak.authorize_redirect(url_for('auth', _external=True))
     app.view_functions['auth.register'] = lambda: ('', 204)
     app.view_functions['auth.reset_password'] = lambda: ('', 204)
     app.view_functions['auth.confirm'] = lambda: ('', 204)
+    app.view_functions['auth.logout'] = sso_logout

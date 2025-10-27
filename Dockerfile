@@ -4,6 +4,7 @@ USER root
 
 COPY ./auth_oidc /opt/CTFd/CTFd/plugins/auth_oidc
 COPY ./bws_s3 /opt/CTFd/CTFd/plugins/bws_s3
+COPY ./challenge_application /opt/CTFd/CTFd/plugins/challenge_application
 COPY ./requirements.txt /opt/CTFd
 COPY ./config.ini /opt/CTFd/CTFd
 
