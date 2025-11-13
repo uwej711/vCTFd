@@ -138,7 +138,7 @@ function checkApplication(retries) {
         } else {
             CTFd.lib.$('#challenge-application-starting').show();
             CTFd.lib.$('#challenge-application-started').hide();
-            if (retries < 4) {
+            if (retries < 10) {
                 retries += 1;
                 setTimeout(checkApplication, 5000, retries);
             }
