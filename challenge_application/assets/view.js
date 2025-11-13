@@ -113,14 +113,14 @@ function processResponse(response) {
         CTFd.lib.$('#challenge-application-panel-stopped').hide();
         CTFd.lib.$('#challenge-application-panel-stopped').hide();
         CTFd.lib.$('#challenge-application-panel-started').show();
-        checkApplication();
+        checkApplication(0);
     } else {
         CTFd.lib.$('#challenge-application-panel-stopped').show();
         CTFd.lib.$('#challenge-application-panel-started').hide();
     }
 }
 
-function checkApplication() {
+function checkApplication(retries) {
     var challenge_id = CTFd._internal.challenge.data.id;
     var url = "/api/v1/plugins/challenge-application/check/" + challenge_id;
 
@@ -138,6 +138,10 @@ function checkApplication() {
         } else {
             CTFd.lib.$('#challenge-application-starting').show();
             CTFd.lib.$('#challenge-application-started').hide();
+            if (retries < 4) {
+                retries += 1;
+                setTimeout(checkApplication, 5000, retries);
+            }
         }
     });
 }

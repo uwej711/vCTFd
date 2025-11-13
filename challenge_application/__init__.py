@@ -45,6 +45,10 @@ class ChallengeWithApplication(DynamicValueChallenge):
     challenge_model = DynamicChallengeWithApplication
 
 
+def get_challenge_runtime():
+    return int(get_app_config("CHALLENGE_RUNTIME_SECONDS", "3600"))
+
+
 def get_challenge_url(challenge_id):
     if 'id' in session:
         user_id = session['id']
@@ -65,7 +69,7 @@ def load(app):
             user_id = session['id']
             hash = uuid.uuid4().hex
 
-            redis.set(f"challenge-{challenge_id}-{user_id}", hash, ex=3600)
+            redis.set(f"challenge-{challenge_id}-{user_id}", hash, ex=get_challenge_runtime())
             redis.zadd(f"applications-{challenge_id}", {hash: int(time.time())})
 
             return {"success": True, "url": get_challenge_url(challenge_id)}, 200
@@ -85,8 +89,8 @@ def load(app):
     def check_appplication(challenge_id):
         if 'id' in session:
             try:
-                requests.head(get_challenge_url(challenge_id), timeout=3.05)
-                return {"success": True}, 200
+                resp = requests.head(get_challenge_url(challenge_id), timeout=3.05)
+                return {"success": True}, resp.status_code
             except requests.exceptions.RequestException:
                 return {"success": False}, 500
         else:
@@ -98,6 +102,7 @@ def load(app):
         challenge_id = request_data['input']['parameters']['challenge']
 
         current_time = int(time.time())
-        hashes = redis.zrangebyscore(f"applications-{challenge_id}", current_time - 3600, current_time + 3600)
+        runtime = get_challenge_runtime()
+        hashes = redis.zrangebyscore(f"applications-{challenge_id}", current_time - runtime, current_time + runtime)
 
         return {'output': {'parameters': [{'hash': h.decode('utf-8')} for h in hashes]}}
