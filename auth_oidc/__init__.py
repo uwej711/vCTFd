@@ -44,7 +44,7 @@ def load(app):
         if userinfo:
             user = get_or_create_user(
                 email=userinfo["email"],
-                name=userinfo["name"]
+                name=userinfo["preferred_username"]
             )
 
             session.regenerate()
