@@ -1,4 +1,4 @@
-FROM docker.io/ctfd/ctfd:3.8.0
+FROM docker.io/ctfd/ctfd:3.8.1
 
 USER root
 
