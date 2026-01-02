@@ -8,8 +8,14 @@
         <div id="challenge-application-panel" style="width: 100%;">
             <div id="challenge-application-panel-stopped" class="card mt-4" style="width: 100%;">
                 <div class="card-body">
-                    <button class="btn btn-primary card-link" id="challenge-application-start" type="button"
-                        onclick="CTFd._internal.challenge.start()">Start Application</button>
+                    <button
+                        class="btn btn-primary card-link"
+                        id="challenge-application-start"
+                        type="button"
+                        onclick="CTFd._internal.challenge.start()"
+                    >
+                        Start Application
+                    </button>
                 </div>
             </div>
             <div id="challenge-application-panel-started" class="card mt-4" style="width: 100%;display: none;">
@@ -17,6 +23,15 @@
                     <a id="challenge-application-domain" target="_blank" rel=“noreferrer“></a>
                     <i id="challenge-application-starting" class="fas fa-circle-notch fa-spin fa-fw spinner"></i>
                     <i id="challenge-application-started" class="fas fa-check fa-fw" style="display: none;"></i>
+                    <button
+                        class="btn btn-primary card-link"
+                        id="challenge-application-stop"
+                        type="button"
+                        onclick="CTFd._internal.challenge.stop()"
+                        style="display: none;"
+                    >
+                        Stop Application
+                    </button>
                 </div>
             </div>
         </div>

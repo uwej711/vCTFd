@@ -71,6 +71,51 @@ CTFd._internal.challenge.start = function () {
     });
 };
 
+CTFd._internal.challenge.stop = function () {
+    var challenge_id = CTFd._internal.challenge.data.id;
+    var url = "/api/v1/plugins/challenge-application/stop/" + challenge_id;
+
+    CTFd.fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(function (response) {
+        if (response.status === 429) {
+            // User was ratelimited but process response
+            return response.json();
+        }
+        if (response.status === 403) {
+            // User is not logged in or CTF is paused.
+            return response.json();
+        }
+        return response.json();
+    }).then(function (response) {
+        if (response.success) {
+            CTFd._functions.events.eventAlert({
+                title: "Success",
+                html: "Your instance has been stopped!",
+                button: "OK"
+            });
+
+            CTFd.lib.$('#challenge-application-domain').text('');
+            CTFd.lib.$('#challenge-application-domain').attr('href', '#');
+            CTFd.lib.$('#challenge-application-panel-stopped').show();
+            CTFd.lib.$('#challenge-application-panel-started').hide();
+            CTFd.lib.$('#challenge-application-start').show();
+            CTFd.lib.$('#challenge-application-stop').hide();
+        } else {
+            CTFd._functions.events.eventAlert({
+                title: "Fail",
+                html: response.message,
+                button: "OK"
+            });
+        }
+    });
+};
+
 CTFd._internal.challenge.submit = function (preview) {
     var challenge_id = parseInt(CTFd.lib.$("#challenge-id").val());
     var submission = CTFd.lib.$("#challenge-input").val();
@@ -111,8 +156,9 @@ function processResponse(response) {
         CTFd.lib.$('#challenge-application-domain').text(url);
         CTFd.lib.$('#challenge-application-domain').attr('href', url);
         CTFd.lib.$('#challenge-application-panel-stopped').hide();
-        CTFd.lib.$('#challenge-application-panel-stopped').hide();
         CTFd.lib.$('#challenge-application-panel-started').show();
+        CTFd.lib.$('#challenge-application-start').hide();
+        CTFd.lib.$('#challenge-application-stop').show();
         checkApplication(0);
     } else {
         CTFd.lib.$('#challenge-application-panel-stopped').show();

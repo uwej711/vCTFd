@@ -54,7 +54,9 @@ def get_challenge_url(challenge_id):
         user_id = session['id']
         hash = redis.get(f"challenge-{challenge_id}-{user_id}")
 
-    return challenge_url_template.format(hash=hash.decode('utf-8')) if hash != None else None
+        return challenge_url_template.format(hash=hash.decode('utf-8')) if hash != None else None
+
+    return None
 
 
 def load(app):
@@ -73,6 +75,19 @@ def load(app):
             redis.zadd(f"applications-{challenge_id}", {hash: int(time.time())})
 
             return {"success": True, "url": get_challenge_url(challenge_id)}, 200
+        else:
+            return '', 403
+
+    @app.route('/api/v1/plugins/challenge-application/stop/<challenge_id>', methods=['POST'])
+    def stop_appplication(challenge_id):
+        if 'id' in session:
+            user_id = session['id']
+
+            hash = redis.get(f"challenge-{challenge_id}-{user_id}")
+            redis.delete(f"challenge-{challenge_id}-{user_id}")
+            redis.zrem(f"applications-{challenge_id}", hash)
+
+            return {"success": True}, 200
         else:
             return '', 403
 
