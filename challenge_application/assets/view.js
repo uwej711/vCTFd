@@ -39,9 +39,6 @@ CTFd._internal.challenge.start = function () {
     var challenge_id = CTFd._internal.challenge.data.id;
     var url = "/api/v1/plugins/challenge-application/start/" + challenge_id;
 
-    CTFd.lib.$('#challenge-application-start').text("Waiting...");
-    CTFd.lib.$('#challenge-application-start').prop('disabled', true);
-
     CTFd.fetch(url, {
         method: 'POST',
         credentials: 'same-origin',
