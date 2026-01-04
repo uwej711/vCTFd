@@ -43,15 +43,19 @@ class BWSS3Uploader(S3Uploader):
             filename = self.s3_prefix + filename
         key = filename
         filename = filename.split("/").pop()
+
+        if filename.endswith(".mp4"):
+            disposition = "inline"
+        else:
+            disposition = "attachment; filename={}".format(filename)
+
         with freeze_time(datetime.datetime.utcfromtimestamp(truncated_timestamp)):
             url = self.s3.generate_presigned_url(
                 "get_object",
                 Params={
                     "Bucket": "{}:{}".format(self.project, self.bucket),
                     "Key": key,
-                    "ResponseContentDisposition": "attachment; filename={}".format(
-                        filename
-                    ),
+                    "ResponseContentDisposition": disposition,
                     "ResponseCacheControl": "max-age=3600",
                 },
                 ExpiresIn=3600,
