@@ -42,6 +42,11 @@
               >
 
                 <div class="mb-3">
+                  <b>Displayname</b>
+                  {{ form.name(class="form-control", value=name) }}
+                </div>
+
+                <div class="mb-3">
                   <b>{{ form.language.label(class="form-label") }}</b>
                   {{ form.language(class="form-select", value=language) }}
                 </div>
