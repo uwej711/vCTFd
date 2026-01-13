@@ -3,6 +3,7 @@ FROM docker.io/ctfd/ctfd:3.8.1
 USER root
 
 COPY ./auth_oidc /opt/CTFd/CTFd/plugins/auth_oidc
+COPY ./auth_oidc/settings.html /opt/CTFd/CTFd/themes/core/templates
 COPY ./bws_s3 /opt/CTFd/CTFd/plugins/bws_s3
 COPY ./challenge_application /opt/CTFd/CTFd/plugins/challenge_application
 COPY ./requirements.txt /opt/CTFd
